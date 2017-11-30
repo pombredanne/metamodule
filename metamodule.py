@@ -4,7 +4,7 @@
 
 "A tiny Python module for taking control of your library's public API."
 
-__version__ = "1.0-dev"
+__version__ = "1.1+dev"
 
 import sys
 import warnings
@@ -62,7 +62,10 @@ class FancyModule(ModuleType):
     def __dir__(self):
         result = set(self.__dict__)
         result.update(self.__auto_import__)
-        result.update(self.__warn_on_access__)
+        # We intentionally don't return the "warn on access" items here,
+        # because (a) you shouldn't be using them, and (b) it creates problems
+        # for things like test discovery that want to iterate through all
+        # attribues.
         return sorted(result)
 
     def __repr__(self):
@@ -98,8 +101,8 @@ def install(name, class_=FancyModule):
         new_module = orig_module
     except TypeError:
         new_module = _hacky_make_metamodule(orig_module, class_)
-    if hasattr(new_module, "__metamodule_init__"):
-        new_module.__metamodule_init__()
+    getattr(type(new_module), "__metamodule_init__", lambda self: None)(
+        new_module)
     sys.modules[name] = new_module
 
 def _hacky_make_metamodule(orig_module, class_):

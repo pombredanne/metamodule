@@ -116,15 +116,17 @@ Versions supported
 Metamodule is currently tested against:
 
 * CPython 2.6, 2.7
-* CPython 3.2, 3.3, 3.4, and pre-releases of 3.5
+* CPython 3.3, 3.4, 3.5, 3.6, 3.7-dev
 
 I suspect it will *work* on pretty much every version of CPython that
 has a working ``ctypes``, I just don't have convenient access to older
 versions to test.
 
-As far as I know we do not yet support PyPy, Jython, etc., but we will
-as soon they catch up with Python 3.5 and start allowing ``__class__``
-assignment on module objects.
+The latest PyPy3 nightlies should also work, and the PyPy3 5.9 release
+when it comes out. PyPy2 is currently not supported, and as far as I
+know neither are Jython, IronPython, etc.; hopefully they will catch
+up with Python 3.5 and start allowing ``__class__`` assignment on
+module objects.
 
 
 How it works
@@ -191,3 +193,25 @@ These two tricks together let us safely support all versions of
 CPython, and as alternative implementations like PyPy catch up with
 CPython 3.5 in supporting ``__class__`` assignment, we'll support
 those too.
+
+
+Change history
+==============
+
+1.2:
+
+* In ``FancyModule``, don't include ``__warn_on_access__`` attributes
+  in ``dir(module)``, to avoid problems with test discovery trying to
+  iterate over all attributes.
+
+1.1:
+
+* When looking up ``__metamodule_init__``, go straight to the class
+  without checking the instance. This makes our behavior more
+  consistent with regular ``__init__``, and avoids accidentally
+  triggering ``__getattr__``. (Thanks to Antony Lee for the report +
+  fix.)
+
+1.0:
+
+* First public release.
